@@ -33,10 +33,16 @@ class RebaseScenarioTests(unittest.TestCase):
     def begin_conflicting_rebase(self):
         self.git("stash", "push", "--all", "-m", "rebase feature")
         stash_oid = self.git("rev-parse", "refs/stash").stdout.strip()
-        result = self.git("rebase", "--no-autostash", "--no-update-refs", self.pinned_base, check=False)
+        self.replay_base_with_conflict()
+        return stash_oid
+
+    def replay_base_with_conflict(self):
+        result = self.git(
+            "rebase", "--no-autostash", "--no-update-refs", "--no-rebase-merges",
+            "--no-rerere-autoupdate", self.pinned_base, check=False,
+        )
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(self.git("diff", "--name-only", "--diff-filter=U").stdout, "render.sh\n")
-        return stash_oid
 
     def restore_and_check(self, stash_oid):
         self.git("stash", "apply", "--index", stash_oid)
@@ -68,6 +74,20 @@ class RebaseScenarioTests(unittest.TestCase):
         stash_oid = self.begin_conflicting_rebase()
         self.git("rebase", "--abort")
         self.assertEqual(self.git("rev-parse", "HEAD").stdout.strip(), self.original_head)
+        self.restore_and_check(stash_oid)
+
+    def test_cached_conflict_resolution_remains_unstaged(self):
+        self.git("config", "rerere.enabled", "true")
+        self.git("config", "rerere.autoupdate", "true")
+        stash_oid = self.begin_conflicting_rebase()
+        resolution = 'printf "mode=main,feature\\n"\n'
+        (self.work / "render.sh").write_text(resolution)
+        self.git("rerere")
+        self.git("rebase", "--abort")
+
+        self.replay_base_with_conflict()
+        self.assertEqual((self.work / "render.sh").read_text(), resolution)
+        self.git("rebase", "--abort")
         self.restore_and_check(stash_oid)
 
     def test_ignored_files_survive_tracked_file_directory_collisions(self):

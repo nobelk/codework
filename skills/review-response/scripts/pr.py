@@ -364,10 +364,14 @@ def reply(host, owner, repo, number, replies, dry_run, expected_head):
 
 def splice(body, section):
     """The PR description with its review-response block replaced, or appended."""
+    start, end = body.find(BLOCK_START), body.find(BLOCK_END)
+    starts, ends = body.count(BLOCK_START), body.count(BLOCK_END)
+    if starts != ends or starts > 1 or end < start:
+        raise ValueError("invalid managed block markers in the pull request description")
+    if BLOCK_START in section or BLOCK_END in section:
+        raise ValueError("invalid managed block markers in the section to publish")
     block = f"{BLOCK_START}\n{section.strip()}\n{BLOCK_END}"
-    start = body.find(BLOCK_START)
-    end = body.find(BLOCK_END, start + len(BLOCK_START)) if start != -1 else -1
-    if start != -1 and end > start:
+    if starts:
         return body[:start] + block + body[end + len(BLOCK_END):]
     return (body.rstrip() + "\n\n" if body.strip() else "") + block + "\n"
 

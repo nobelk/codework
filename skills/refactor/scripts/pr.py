@@ -56,9 +56,14 @@ def find(branch):
 
 def splice(body, section):
     """The PR description with its refactor block replaced, or appended."""
-    block = f"{BLOCK_START}\n{section.strip()}\n{BLOCK_END}"
     start, end = body.find(BLOCK_START), body.find(BLOCK_END)
-    if start != -1 and end > start:
+    starts, ends = body.count(BLOCK_START), body.count(BLOCK_END)
+    if starts != ends or starts > 1 or end < start:
+        raise ValueError("invalid managed block markers in the pull request description")
+    if BLOCK_START in section or BLOCK_END in section:
+        raise ValueError("invalid managed block markers in the section to publish")
+    block = f"{BLOCK_START}\n{section.strip()}\n{BLOCK_END}"
+    if starts:
         return body[:start] + block + body[end + len(BLOCK_END):]
     return (body.rstrip() + "\n\n" if body.strip() else "") + block + "\n"
 
@@ -121,4 +126,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except ValueError as error:
+        print(error, file=sys.stderr)
+        sys.exit(1)

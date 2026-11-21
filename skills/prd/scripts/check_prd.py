@@ -234,6 +234,10 @@ def check_ids(tables):
     for section in sorted(REQUIRED_TABLES - seen_sections):
         prefix, columns = ID_TABLES[section]
         problems.append(f"section {section} has no table of {prefix} items (| " + " | ".join(c.capitalize() for c in columns) + " |)")
+    populated_sections = {item["section"] for item in items.values()}
+    for section in sorted((REQUIRED_TABLES & seen_sections) - populated_sections):
+        prefix, _ = ID_TABLES[section]
+        problems.append(f"section {section} has no {prefix} items")
     return problems, items
 
 

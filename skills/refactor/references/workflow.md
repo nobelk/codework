@@ -19,7 +19,7 @@ The standard: code is clean if it can be understood easily, by everyone on the t
 
 ## Conventions
 
-Before asking the first decision, load Matt Pocock’s installed `grilling` skill. On Codex use the skill registry entry `mattpocock-skills:grilling` and read its registered instructions. On Gemini CLI activate `grilling` through the skill tool. Run the interview as instructed there. If it is missing or disabled, pause the interview and name the missing skill. On Codex, run `codex plugin marketplace add mattpocock/skills` and `codex plugin add mattpocock-skills@mattpocock`. On Gemini CLI, run `gemini skills install https://github.com/mattpocock/skills.git --path skills/productivity`. Reopen the session and confirm discovery before continuing.
+Before asking the first decision, load Matt Pocock’s installed `grilling` skill. On Codex use the skill registry entry `mattpocock-skills:grilling` and read its registered instructions. On Gemini CLI activate `grilling` through the skill tool. Run the interview as instructed there. If it is missing or disabled, pause the interview and name the missing skill. On Codex, run `codex plugin marketplace add mattpocock/skills` and `codex plugin add mattpocock-skills@mattpocock`. On Gemini CLI, clone upstream with `git clone https://github.com/mattpocock/skills.git mattpocock-skills` and run `gemini skills install ./mattpocock-skills/skills/productivity`. Use an existing upstream checkout if available. Reopen the session and confirm discovery before continuing.
 
 Facts are your legwork. Whatever the code, the docs, or a command can answer gets looked up. Where a missing input has a safe default, take it and say so in the session's opening status instead of asking.
 

@@ -66,7 +66,7 @@ Then look across the items: name each **cross-cutting theme** (three comments po
 
 ## Step 3 - Grill the user on the contested calls
 
-Load Matt Pocock’s installed `grilling` skill before the interview. On Codex use the skill registry entry `mattpocock-skills:grilling` and read its registered instructions. On Gemini CLI activate `grilling` through the skill tool. Run the interview as instructed there. If it is missing or disabled, pause the interview and name the missing skill. On Codex, run `codex plugin marketplace add mattpocock/skills` and `codex plugin add mattpocock-skills@mattpocock`. On Gemini CLI, run `gemini skills install https://github.com/mattpocock/skills.git --path skills/productivity`. Reopen the session and confirm discovery before continuing.
+Load Matt Pocock’s installed `grilling` skill before the interview. On Codex use the skill registry entry `mattpocock-skills:grilling` and read its registered instructions. On Gemini CLI activate `grilling` through the skill tool. Run the interview as instructed there. If it is missing or disabled, pause the interview and name the missing skill. On Codex, run `codex plugin marketplace add mattpocock/skills` and `codex plugin add mattpocock-skills@mattpocock`. On Gemini CLI, clone upstream with `git clone https://github.com/mattpocock/skills.git mattpocock-skills` and run `gemini skills install ./mattpocock-skills/skills/productivity`. Use an existing upstream checkout if available. Reopen the session and confirm discovery before continuing.
 
 Seed the design tree with what is the user's to decide, each question carrying the evidence behind its recommended answer:
 

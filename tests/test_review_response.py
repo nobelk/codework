@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 HELPER = ROOT / "skills/review-response/scripts/pr.py"
+REFACTOR_HELPER = ROOT / "skills/refactor/scripts/pr.py"
 PR_URL = "https://github.com/example/project/pull/7"
 HEAD = "b" * 40
 ROOT_COMMENT_ID = 3_000_000_011
@@ -37,13 +38,13 @@ class ReviewResponseTests(unittest.TestCase):
     def save_state(self):
         self.state_path.write_text(json.dumps(self.state))
 
-    def run_helper(self, command, *args, succeeds=True):
+    def run_helper(self, command, *args, succeeds=True, helper=HELPER):
         env = os.environ | {
             "PATH": str(ROOT / "tests/fixtures") + os.pathsep + os.environ["PATH"],
             "CODEWORK_GH_STATE": str(self.state_path),
         }
         result = subprocess.run(
-            [sys.executable, str(HELPER), command, PR_URL, *map(str, args)],
+            [sys.executable, str(helper), command, PR_URL, *map(str, args)],
             capture_output=True, text=True, env=env, timeout=10,
         )
         if succeeds:
@@ -141,3 +142,17 @@ class ReviewResponseTests(unittest.TestCase):
         self.assertIn("Maintainer's introduction", updated)
         self.assertIn("Changes verified.", updated)
         self.assertFalse(self.run_helper("body", section, "--expect-head", "c" * 40)["changed"])
+
+    def test_pr_body_helpers_refuse_unmatched_markers_without_a_write(self):
+        section = self.directory / "pr-section.md"
+        section.write_text("Changes verified.")
+        for skill, helper, args in (
+            ("review-response", HELPER, ("--expect-head", HEAD)),
+            ("refactor", REFACTOR_HELPER, ()),
+        ):
+            with self.subTest(skill=skill):
+                self.state["pr"]["body"] = f"<!-- {skill}:start -->\nMaintainer's notes"
+                self.save_state()
+                error = self.run_helper("body", section, *args, succeeds=False, helper=helper)
+                self.assertIn("invalid managed block markers", error)
+                self.assertEqual(json.loads(self.state_path.read_text()), self.state)

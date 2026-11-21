@@ -45,7 +45,7 @@ Where the README and the code disagree (the README promises Postgres, the code u
 
 ## Step 2 - Grill the user (`grilling` skill)
 
-Load Matt Pocock’s installed `grilling` skill before the interview. On Codex use the skill registry entry `mattpocock-skills:grilling` and read its registered instructions. On Gemini CLI activate `grilling` through the skill tool. Run the interview as instructed there. If it is missing or disabled, pause the interview and name the missing skill. On Codex, run `codex plugin marketplace add mattpocock/skills` and `codex plugin add mattpocock-skills@mattpocock`. On Gemini CLI, run `gemini skills install https://github.com/mattpocock/skills.git --path skills/productivity`. Reopen the session and confirm discovery before continuing.
+Load Matt Pocock’s installed `grilling` skill before the interview. On Codex use the skill registry entry `mattpocock-skills:grilling` and read its registered instructions. On Gemini CLI activate `grilling` through the skill tool. Run the interview as instructed there. If it is missing or disabled, pause the interview and name the missing skill. On Codex, run `codex plugin marketplace add mattpocock/skills` and `codex plugin add mattpocock-skills@mattpocock`. On Gemini CLI, clone upstream with `git clone https://github.com/mattpocock/skills.git mattpocock-skills` and run `gemini skills install ./mattpocock-skills/skills/productivity`. Use an existing upstream checkout if available. Reopen the session and confirm discovery before continuing.
 
 Seed the design tree from the README, the survey, and (in revise mode) the existing files, so every question and recommended answer is specific to this project. The tree covers at least:
 
@@ -206,4 +206,4 @@ Leave the three files uncommitted. Report:
 - In revise mode: what changed in each file, and which phases were left untouched because they are `done` or in flight.
 - The independent review outcome: total findings and the accept / reject / defer breakdown, with a one-line reason for each rejection and a destination for each deferral (or which Step 4 option was taken and why).
 - Any README/code disagreement the user resolved, if the README now needs updating to match.
-- Next step: commit the three files and get them onto the default branch (a direct push, or a merged PR), then run `spec`. `spec` cuts its worktree from `origin/<default>`, so it only sees a constitution that has landed there.
+- Next step: after approval, commit the three files to the branch that `spec` will use. A local working branch is sufficient for a local workflow. If the repository plans from a shared default branch, integrate the constitution there through its normal process, then run `spec`.

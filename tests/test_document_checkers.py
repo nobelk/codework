@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -20,6 +21,16 @@ class DocumentCheckerTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("result: PASS", result.stdout)
 
+    def test_prd_rejects_empty_requirement_tables(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "empty-requirements.md"
+            lines = (EXAMPLE / "prod_req.md").read_text().splitlines()
+            path.write_text("\n".join(line for line in lines if not line.startswith(("| FR", "| NFR"))))
+            result = self.checker("prd", "check_prd.py", path)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("section 6 has no FR items", result.stdout)
+        self.assertIn("section 7 has no NFR items", result.stdout)
+
     def test_design_reports_structure_separately_from_rendering(self):
         result = self.checker("design-doc", "check_design_doc.py", "design.md", "--no-render")
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
@@ -30,3 +41,11 @@ class DocumentCheckerTests(unittest.TestCase):
         result = self.checker("design-doc", "check_design_doc.py", "missing.md", "--no-install")
         self.assertEqual(result.returncode, 1)
         self.assertIn("cannot read the document", result.stdout)
+
+    def test_design_checker_rejects_an_unterminated_mermaid_block(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "unclosed-diagram.md"
+            path.write_text((EXAMPLE / "design.md").read_text() + "\n```mermaid\nflowchart TD\n")
+            result = self.checker("design-doc", "check_design_doc.py", path, "--no-render")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("unterminated Mermaid block", result.stdout)

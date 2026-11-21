@@ -102,7 +102,7 @@ def normalize(heading: str) -> str:
 
 
 def parse(text: str):
-    """Return (h2 headings, mermaid blocks, prose lines) with fenced code removed from prose."""
+    """Separate headings, closed Mermaid blocks, prose, and an unclosed Mermaid fence."""
     headings, blocks, prose = [], [], []
     fence, lang, start, buf = None, "", 0, []
     for number, line in enumerate(text.splitlines(), 1):
@@ -121,7 +121,8 @@ def parse(text: str):
             fence = None
         else:
             buf.append(line)
-    return headings, blocks, prose
+    unclosed_mermaid_line = start if fence and lang == "mermaid" else None
+    return headings, blocks, prose, unclosed_mermaid_line
 
 
 def check_sections(headings):
@@ -279,7 +280,7 @@ def main():
         print(f"  - cannot read the document: {error}")
         print("result: FAIL")
         return 1
-    headings, blocks, prose = parse(text)
+    headings, blocks, prose, unclosed_mermaid_line = parse(text)
     failed = False
 
     def report(name, problems, notes=(), ok=""):
@@ -290,7 +291,10 @@ def main():
             print(f"  - {line}")
 
     report("sections", check_sections(headings), ok=f"{len(SECTIONS)} of {len(SECTIONS)}, in order")
-    report("figures", check_figures(blocks, prose), ok=f"{len(blocks)} captioned and cited")
+    figure_problems = check_figures(blocks, prose)
+    if unclosed_mermaid_line is not None:
+        figure_problems.append(f"line {unclosed_mermaid_line}: unterminated Mermaid block")
+    report("figures", figure_problems, ok=f"{len(blocks)} captioned and cited")
     unavailable = None
     if args.no_render:
         unavailable = "--no-render given"

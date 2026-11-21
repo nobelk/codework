@@ -16,7 +16,7 @@ Stop before touching anything rather than partway through.
 
 1. **Resolve `<input>`** from the argument to a full refname, `refs/heads/<name>` or `refs/remotes/<remote>/<name>`, and use that from here on: a tag or other ref with the same short name otherwise wins silently. With no argument, list `git branch -a --sort=-committerdate` and ask the user to pick, offering the default branch's remote ref (e.g. `origin/main`) first. If the user named a branch to rebase that isn't the current one, ask before checking it out. If `<input>` exists neither locally nor on any remote, tell the user and stop.
    - **Remote ref** (`origin/main`, or a name that exists only on a remote): fetch with an explicit refspec, `git fetch <remote> '+refs/heads/<name>:refs/remotes/<remote>/<name>'`, then `git rev-parse --verify refs/remotes/<remote>/<name>`. A plain `git fetch <remote> <name>` can update only `FETCH_HEAD` in a single-branch or narrowed clone, leaving the tracking ref stale while reporting success. Rebase onto the tracking ref directly; no local branch is needed.
-   - **Local branch:** if it tracks a remote, fetch the upstream the same way; if `git rev-list <input>..<input>@{upstream}` is non-empty, the local branch is behind: ask whether to rebase onto the local tip, the upstream tip, or stop.
+   - **Local branch:** get the full tracking ref with `git for-each-ref --format='%(upstream)' <input>`. If it names a remote ref, fetch it as above. If `git rev-list <input>..<upstream-ref>` returns commits, ask whether to rebase onto the local tip, the upstream tip, or stop.
 2. **Check there is something to do.** Record `git branch --show-current` as `<current>`. Stop and tell the user when:
    - `<current>` is empty: a detached HEAD, which is also what a rebase in progress looks like;
    - a merge, cherry-pick, or revert is in progress (`MERGE_HEAD`, `CHERRY_PICK_HEAD`, `REVERT_HEAD`, `rebase-merge`, or `rebase-apply` exists at `git rev-parse --git-path <name>`), since stashing would silently cancel it;
@@ -55,11 +55,11 @@ Check two things about the branch's own commits before replaying them:
 ## Step 2 - Rebase
 
 ```bash
-git rebase --no-autostash --no-update-refs <input-sha>
-git rebase --no-autostash --no-update-refs --onto <input-sha> <fork-point>   # instead, when Step 1 moved <fork-point>
+git rebase --no-autostash --no-update-refs --no-rebase-merges --no-rerere-autoupdate <input-sha>
+git rebase --no-autostash --no-update-refs --no-rebase-merges --no-rerere-autoupdate --onto <input-sha> <fork-point>
 ```
 
-`--no-update-refs` keeps other local branches where they are even when the user's config sets `rebase.updateRefs`, so the rollback in Step 7 restores everything the rebase moved.
+Use the `--onto` form when Step 1 moved `<fork-point>`. `--no-update-refs` keeps other local branches where they are. `--no-rebase-merges` applies the flattening described in Step 1. `--no-rerere-autoupdate` leaves cached conflict resolutions unstaged for inspection and approval.
 
 Resolve conflicts yourself, and confirm the risky ones. Record every conflict in a **conflict list** (replayed commit, file, mechanical or risky, resolution); Steps 3, 4, and 7 use it.
 

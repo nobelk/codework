@@ -15,19 +15,22 @@ codex plugin marketplace add nobelk/codework --ref v0.1.0
 codex plugin add codework@codework
 ```
 
-The Codework release command resolves once the tag is published. For development, pass the absolute checkout path in place of `nobelk/codework --ref v0.1.0`. Start a fresh `codex` session in the target repository. Use the `$` picker to select `codework:design-doc`, and confirm `mattpocock-skills:grilling` and `mattpocock-skills:tdd` appear. Run `$mattpocock-skills:setup-matt-pocock-skills` once in each repository to record tracker, labels, and document destinations.
+For development, pass the absolute checkout path in place of `nobelk/codework --ref v0.1.0`. Start a fresh `codex` session in the target repository. Use the `$` picker to select `codework:design-doc`, and confirm `mattpocock-skills:grilling` and `mattpocock-skills:tdd` appear. Run `$mattpocock-skills:setup-matt-pocock-skills` once in each repository to record tracker, labels, and document destinations.
 
 ## Gemini CLI
 
-The target for clean-install verification is Gemini CLI 0.70.0 with Node.js 20 or later. Enable Agent Skills and authenticate the model. [Gemini CLI installation](https://geminicli.com/docs/get-started/installation/)
+Use Gemini CLI 0.70.0 with Node.js 20 or later. Enable Agent Skills and authenticate the model. Clone the prerequisite with Git and install each group from disk. Gemini CLI 0.70.0 can reject Git URL skill installs with a `GIT_CONFIG_SYSTEM` error. [Gemini CLI installation](https://geminicli.com/docs/get-started/installation/)
 
 ```sh
-gemini skills install https://github.com/mattpocock/skills.git --path skills/engineering
-gemini skills install https://github.com/mattpocock/skills.git --path skills/productivity
+git clone https://github.com/mattpocock/skills.git mattpocock-skills
+gemini skills install ./mattpocock-skills/skills/engineering
+gemini skills install ./mattpocock-skills/skills/productivity
 gemini extensions install https://github.com/nobelk/codework --ref=v0.1.0
 ```
 
-For development, use `gemini extensions link /absolute/path/to/codework`. Open Gemini in your target repository. Run `/skills list` and check for `grilling`, `tdd`, and the eight entries below. Prompt `Use the setup-matt-pocock-skills skill to configure this repository` once per repo. When Gemini asks to activate a skill, approve that skill by name. Re-run the upstream installation commands to update the Matt Pocock dependency.
+If extension installation falls back to Git and hits the same error, clone the tagged source with `git clone --branch v0.1.0 https://github.com/nobelk/codework.git` and run `gemini extensions install ./codework`. For development use `gemini extensions link /absolute/path/to/codework`. Review the sources and approve Gemini's trust prompts for the folders you install from.
+
+Open Gemini in your target repository. Run `/skills list` and check for `grilling`, `tdd`, and the eight entries below. Prompt `Use the setup-matt-pocock-skills skill to configure this repository` once per repo. When Gemini asks to activate a skill, approve that skill by name. To update the Matt Pocock dependency, pull the upstream checkout and reinstall both local groups.
 
 ## Skill catalog
 
