@@ -1,0 +1,20 @@
+{
+  "name": "codework",
+  "interface": {
+    "displayName": "Codework"
+  },
+  "plugins": [
+    {
+      "name": "codework",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "codework",
+  "version": "0.1.0",
+  "description": "Software engineering skills for requirements, design, implementation, and review.",
+  "author": {
+    "name": "Nobel Khandaker",
+    "url": "https://github.com/nobelk"
+  },
+  "repository": "https://github.com/nobelk/codework",
+  "license": "Apache-2.0",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Codework",
+        "shortDescription": "Plan, implement, and review software changes."
+      }
+    }
+  }
+}

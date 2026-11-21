@@ -1,0 +1,23 @@
+# Source inventory
+
+The baseline is `nobelk/dotfiles` at `d5750fe4b01a5f5794cd92288fe3164be2ad7cbc`. Each row names the source directory under `claude/skills/` and the matching package directory under `skills/`. The two packages read the same directories. The detailed workflows live under `references/` so the host can load the entry point within its skill prompt budget. [Pinned source tree](https://github.com/nobelk/dotfiles/tree/d5750fe4b01a5f5794cd92288fe3164be2ad7cbc/claude/skills)
+
+| Source and package directory | Codex ID | Gemini CLI ID | Baseline assets and adaptations |
+| --- | --- | --- | --- |
+| `prd` | `codework:prd` | `prd` | `assets/template.md`, `references/ears.md`, and `scripts/check_prd.py` retained. `references/codex-review.md` becomes a portable PRD review brief. Sends goal, story, and requirement IDs to design and spec. |
+| `design-doc` | `codework:design-doc` | `design-doc` | `assets/template.md`, architecture and C4 references, and `scripts/check_design_doc.py` retained. Portable design review replaces the Codex companion. Adds mapping from PRD IDs to sections, tasks, checks, and linked ADRs. |
+| `constitution` | `codework:constitution` | `constitution` | Portable `references/review.md` replaces the Codex review launcher. `specs/mission.md` and `specs/roadmap.md` bound what `spec` plans. `specs/tech-stack.md` governs planning and the gates that `code` runs. |
+| `spec` | `codework:spec` | `spec` | Portable `references/review.md` replaces the review launcher. Keeps `requirements.md`, `plan.md`, and `validation.md` with decisions, agreed seams, and dependencies. Uses Git or the host's worktree capability. Commit and push require authorization. |
+| `code` | `codework:code` | `code` | `references/trackers.md` adapted for configured tracker access and local inputs. `agents/openai.yaml` supplied source UI metadata. Portable frontmatter and plugin registration provide discovery. `references/review.md` carries spec and code review. |
+| `refactor` | `codework:refactor` | `refactor` | `ARCHITECTURE.md`, `CLEAN_CODE.md`, and `scripts/pr.py` retained. `CODEX.md` becomes a portable independent plan review. Supports local refactoring without GitHub. |
+| `rebase` | `codework:rebase` | `rebase` | `references/inconsistency-hunt.md` and `references/doc-sweep.md` retained. Review brief replaces the external review skill. The pinned replay and stash restoration are local Git operations. |
+| `review-response` | `codework:review-response` | `review-response` | `CODEX.md` becomes a portable independent plan review. `scripts/pr.py` retains GitHub fetch, reply, and marked-body commands. Writes verify the reviewed head. Thread versions detect edits, additions, and deletions. |
+
+## Dependencies and handoffs
+
+- Matt Pocock’s `grilling` is required for the decision interviews in `prd`, `design-doc`, `constitution`, `spec`, `refactor`, and `review-response`. `code` uses `tdd` at agreed public seams. Codex discovers the namespaced plugin entries and their local instructions. Gemini activates the plain IDs through its skill tool. The [quickstart](quickstart.md) documents install and once-per-repository setup. The [verification record](verification.md) identifies the upstream version actually exercised for discovery.
+- Source `grill-me` and `ask-matt` are represented by upstream `grilling`. Source `jira-planner` and `to-tickets` are handoffs to Codework `spec` or to user-provided, configured tracker context. Source `simplify` is covered by the local cleanup path in Codework `refactor`.
+- Source `spec-review` and `codex-review` are represented by the packaged review briefs. Use a permitted independent reviewer or a separate model and record review pending when unavailable. Source `resolving-merge-conflicts` is covered by the conflict procedure in `rebase`. Host-specific question and worktree tools are optional. The conversation and ordinary Git commands cover their portable equivalents.
+- Scripts use Python's standard library and Git or `gh` where indicated. The design checker uses Mermaid CLI to render diagrams. Jira and GitHub inputs refer to the repository's configured tracker, where available. The GitHub review workflows require access to the specific repository and PR.
+
+The original source tree has no license or notice file for these eight skills at the pinned revision. The port credits Nobel Khandaker and the pinned dotfiles source and uses Codework’s [Apache 2.0 license](../LICENSE). Matt Pocock’s skills are installed separately under their own terms. [Matt Pocock upstream license](https://github.com/mattpocock/skills/blob/main/LICENSE)

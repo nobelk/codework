@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+"""GitHub CLI fixture for the packaged review-response helper tests."""
+
+import json
+import os
+import sys
+from pathlib import Path
+
+args = sys.argv[1:]
+state_path = Path(os.environ["CODEWORK_GH_STATE"])
+state = json.loads(state_path.read_text())
+pr = state["pr"]
+thread = state["thread"]
+pull = "repos/example/project/pulls/7"
+
+if args[:2] == ["api", "graphql"]:
+    data = {
+        "viewer": {"login": "engineer"},
+        "repository": {"pullRequest": {
+            "number": 7, "url": "https://github.com/example/project/pull/7",
+            "title": "Add line counts", "body": pr["body"], "state": pr["state"],
+            "isDraft": False, "isCrossRepository": False, "author": {"login": "engineer"},
+            "headRefName": "feature", "headRefOid": pr["head"], "baseRefName": "main",
+            "headRepository": {"nameWithOwner": "example/project"}, "commits": {"nodes": []},
+            "reviewThreads": {
+                "pageInfo": {"hasNextPage": False},
+                "nodes": [thread] if thread else [],
+            },
+        }},
+    }
+    if "-f" in args and any(arg.startswith("id=") for arg in args):
+        data["node"] = thread
+    print(json.dumps({"data": data}))
+elif "--paginate" in args:
+    if "repos/example/project/issues/7/comments" in args:
+        for comment in state.get("conversation", []):
+            print(json.dumps(comment))
+elif "--method" in args:
+    message = json.load(sys.stdin)["body"]
+    root_id = thread["comments"]["nodes"][0]["fullDatabaseId"] if thread else None
+    if f"{pull}/comments/{root_id}/replies" in args:
+        comments = thread["comments"]
+        reply = {
+            "fullDatabaseId": "22", "author": {"login": "engineer"}, "body": message,
+            "createdAt": "2026-11-21T12:16:00Z", "updatedAt": "2026-11-21T12:16:00Z",
+            "url": "https://github.com/example/project/pull/7#discussion_r22",
+        }
+        comments["nodes"].append(reply)
+        comments["totalCount"] += 1
+        if "conversation_after_reply" in state:
+            state.setdefault("conversation", []).append(state.pop("conversation_after_reply"))
+        url = reply["url"]
+    elif pull in args and "PATCH" in args:
+        pr["body"] = message
+        url = "https://github.com/example/project/pull/7"
+    else:
+        sys.exit(f"Unexpected mutation: {args}")
+    state_path.write_text(json.dumps(state))
+    print(json.dumps({"html_url": url}))
+elif pull in args:
+    print(json.dumps({"body": pr["body"], "head": {"sha": pr["head"]}, "state": pr["state"].lower()}))
+else:
+    sys.exit(f"Unexpected gh command: {args}")
