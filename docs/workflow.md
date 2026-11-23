@@ -28,7 +28,7 @@ Run three negative cases in disposable copies.
 
 1. Name a nonexistent PRD and verify the agent asks for it before drafting. Disable or remove upstream `grilling`, reopen the host, and run the pilot with the real PRD. Expect a specific dependency and install instruction, then reinstall and resume. Repeat with `tdd` and the implementation row.
 2. Make a copy of the spec with a required gate that fails, or with a command absent from PATH. Verify that acceptance evidence records the exact failure and leaves the gate outstanding. Restore the real gate and rerun on the updated candidate.
-3. At the first approval request, ask for a regression case with valid lines followed by an invalid UTF-8 byte. Require a nonzero exit, a diagnostic, and empty standard output. Verify that it reruns affected tests and gates, returns for independent review where affected, and asks for approval of the new revision. Record the human decision and revision together.
+3. At the first approval request, ask for a new regression case. If the suite covers only calls with zero or one path, request a two-path invocation with a nonzero exit, a usage diagnostic, and empty standard output. Verify that the agent reruns affected tests and gates, returns for independent review where affected, and asks for approval of the new revision. Record the human decision and revision together.
 
 ## Rebase with a preserved index
 

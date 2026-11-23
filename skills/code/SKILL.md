@@ -20,7 +20,7 @@ If TDD is missing or disabled, name it and pause implementation. On Codex, run `
 
 ## 3. Implement and verify
 
-Work in dependency order. Parallelize disjoint task groups only when delegation and isolated worktrees are available. Integrate them one at a time and rerun affected checks. At each seam, run the failing test first, implement enough to pass, and re-run the targeted suite. Keep requirement and test evidence together. Obtain the user's decision before implementing a conflicting or materially changed requirement.
+Work in dependency order. Parallelize disjoint task groups only when delegation and isolated worktrees are available. Integrate them one at a time and rerun affected checks. At each agreed seam, take one behavior at a time. Run one failing test, implement enough to pass it, and rerun the targeted suite before starting the next behavior. Keep requirement and test evidence together. Obtain the user's decision before implementing a conflicting or materially changed requirement.
 
 Use Codework's `refactor` for a scoped cleanup where warranted. Give it a clean phase worktree, a local implementation commit containing only the selected change, and the pinned comparison base. Use an isolated worktree for that candidate if the original checkout has unrelated tracked work. Ask it to preserve behavior and keep the work local.
 
